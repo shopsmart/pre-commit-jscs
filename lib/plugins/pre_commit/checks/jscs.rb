@@ -7,7 +7,6 @@ See the file LICENSE for copying permission.
 require 'pre-commit/error_list'
 require 'pre-commit/checks/plugin'
 
-
 module PreCommit
   module Checks
     class Jscs < Shell
@@ -33,19 +32,6 @@ module PreCommit
         config_file ? ['--preset', config_file] : []
       end
 
-    private
-
-      # def run_check(file)
-      #   if
-      #     true # add a check here to verify files
-      #   then
-      #     nil
-      #   else
-      #     PreCommit::ErrorList.new(PreCommit::Line.new("Describe why verification failed", file))
-      #   end
-      # end
-
     end
-
   end
 end
