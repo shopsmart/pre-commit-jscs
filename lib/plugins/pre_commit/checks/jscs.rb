@@ -6,7 +6,8 @@ See the file LICENSE for copying permission.
 
 require 'pre-commit/error_list'
 require 'pre-commit/checks/plugin'
-require "pre-commit/configuration/top_level"
+require 'pre-commit/configuration/top_level'
+require 'pre-commit/checks/shell'
 require 'mkmf'
 require 'find'
 
