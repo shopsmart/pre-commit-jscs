@@ -44,7 +44,7 @@ module PreCommit
 
         result =
         in_groups(staged_files).map do |files|
-          args = [(app_source || sys_source)] + files
+          args = [(app_source || sys_source)] + config_file_flag + files
           execute(args)
         end.compact
 
@@ -52,7 +52,11 @@ module PreCommit
       end
 
       def config_file_flag
-        config_file ? ['--preset', config_file] : []
+        config_file ? ['-c', config_file] : []
+      end
+
+      def alternate_config_file
+        '.jscsrc'
       end
 
     end
