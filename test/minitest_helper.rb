@@ -15,7 +15,7 @@ then
       SimpleCov::Formatter::HTMLFormatter,
       Coveralls::SimpleCov::Formatter,
     ]
-    command_name "Spesc Tests"
+    command_name "Specs Tests"
     add_filter "/test/"
   end
 
@@ -24,13 +24,17 @@ end
 
 require 'minitest/autorun'
 require "minitest/reporters"
-require "mocha/setup"
+require 'tmpdir'
 require 'pluginator'
 
 module PreCommit; module Helpers
+  def fixture_file(filename)
+    file_dir = File.expand_path('../files', __FILE__).sub("#{project_dir}/", "")
+    File.join(file_dir, filename)
+  end
 
-  def test_files
-    File.expand_path("../files", __FILE__)
+  def project_dir
+    File.expand_path("../../", __FILE__)
   end
 
 end; end

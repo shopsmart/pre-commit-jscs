@@ -7,18 +7,28 @@ See the file LICENSE for copying permission.
 require 'minitest_helper'
 require 'plugins/pre_commit/checks/jscs'
 
+class TestConfig
+  def get(arg); end
+end
+
 describe PreCommit::Checks::Jscs do
-  let(:check){ PreCommit::Checks::Jscs.new(nil, nil, []) }
+  let(:check) do
+    config = TestConfig.new
+    PreCommit::Checks::Jscs.new(nil, config, [])
+  end
 
   it "does nothing" do
-    check.send(:run_check, "rake").must_equal(nil)
+    check.call([]).must_equal(nil)
   end
 
-  it "checks files" do
-    Dir.chdir(test_files) do
-      # TODO: create example files in test/files
-      check.send(:run_check, ".keep").must_equal(nil)
-    end
+  it "returns nothing if the file has no errors" do
+    check.call([fixture_file("file.js")]).must_equal(nil)
   end
 
+  it "returns jscs errors if the file contains errors" do
+    check.call([fixture_file("bad-file.js")]).must_match(/requireSemicolons/i)
+    check.call([fixture_file("bad-file.js")]).must_match(/disallowMultipleVarDecl/i)
+    check.call([fixture_file("bad-file.js")]).must_match(/disallowSpaceAfterObjectKeys/i)
+    check.call([fixture_file("bad-file.js")]).must_match(/validateQuoteMarks/i)
+  end
 end
