@@ -9,6 +9,6 @@ module PreCommit
   # placeholder for gem VERSION
   module Jscs
     # the gem version, rules of versioning: http://semver.org/
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
   end
 end
