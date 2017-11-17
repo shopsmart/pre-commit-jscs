@@ -16,39 +16,26 @@ module PreCommit
     class Jscs < Shell
       include PreCommit::Configuration::TopLevel
 
-      def node_modules_bin
-        @node_modules ||= File.join(self.top_level, 'node_modules', '.bin')
-      end
-
-      # First look for jscs in the top_level
-      def app_source
-        return @app_source if @app_source
-
-        Find.find(node_modules_bin) {|path| @app_source = path if path =~ /jscs$/ }
-        @app_source
-      end
-
-      # If jscs is not in the top_level see if its defined within the system
-      def sys_source
-        @sys_source ||= MakeMakefile.find_executable("jscs")
-      end
-
       def self.description
-        "Support for jscs linting"
+        'Support for jscs linting'
       end
 
       def call(staged_files)
-        return "JSCS executable could not be located" if app_source.nil? && sys_source.nil?
+        return 'JSCS executable could not be located' if jscs_source.nil?
+
+        # Check for .js files
         staged_files = staged_files.grep(/\.js$/)
         return if staged_files.empty?
-
-        result =
-        in_groups(staged_files).map do |files|
-          args = [(app_source || sys_source)] + config_file_flag + files
-          execute(args)
+        result = in_groups(staged_files).map do |files|
+          run_check(files)
         end.compact
 
         result.empty? ? nil : result.join("\n")
+      end
+
+      def run_check(files)
+        args = [jscs_source] + config_file_flag + files
+        execute(args)
       end
 
       def config_file_flag
@@ -59,6 +46,31 @@ module PreCommit
         '.jscsrc'
       end
 
+      def node_modules_bin
+        @node_modules_bin ||= File.join(self.top_level, 'node_modules', '.bin')
+      end
+
+      # First look for jscs in the top_level
+      def app_source
+        @app_source ||= begin
+          return unless File.directory?(node_modules_bin)
+          Find.find(node_modules_bin) { |path| @app_source = path if path =~ /jscs$/ }
+        end
+      end
+
+      # If jscs is not in the top_level see if its defined within the system
+      def sys_source
+        @sys_source ||= MakeMakefile.find_executable('jscs')
+      end
+
+      def jscs_source
+        app_source || sys_source
+      end
     end
   end
+end
+
+# Pevents MakeMakefile from generating log file
+module Logging
+  @logfile = File::NULL
 end
